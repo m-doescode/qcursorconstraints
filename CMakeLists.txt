@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.30.0)
+set(CMAKE_CXX_STANDARD 20)
+project(QCursorConstraints VERSION 0.1.0)
+
+set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
+
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_subdirectory(qcursorconstraints)
+add_subdirectory(demo)
