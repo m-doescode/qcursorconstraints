@@ -38,3 +38,22 @@ if (NOT WIN32)
 endif()
 
 target_compile_definitions(QCursorConstraints PRIVATE QCURSORCONSTRAINTS_LIBRARY)
+
+target_include_directories(QCursorConstraints PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+
+# https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html
+install(TARGETS QCursorConstraints
+        EXPORT QCursorConstraintsTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(FILES qcursorconstraints.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+install(EXPORT QCursorConstraintsTargets
+        FILE QCursorConstraintsTargets.cmake
+        NAMESPACE QCursorConstraints::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QCursorConstraints
+)
