@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Gui Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets)
 
-add_library(QCursorConstraints SHARED
+add_library(QCursorConstraints STATIC
   qcursorconstraints.cpp
   qcursorconstraints.h
   platform/generic.cpp

@@ -72,8 +72,8 @@ static bool confineCursor_generic(QWindow* window, QRect rect) {
 }
 
 QCursorConstraintsImpl QCursorConstraints::genericImpl {
-    .init = &init_generic,
-    .lockCursor = &lockCursor_generic,
-    .confineCursor = &confineCursor_generic,
-    .unlockCursor = &unlockCursor_generic,
+    /* .init = */ &init_generic,
+    /* .lockCursor = */ &lockCursor_generic,
+    /* .confineCursor = */ &confineCursor_generic,
+    /* .unlockCursor = */ &unlockCursor_generic,
 };

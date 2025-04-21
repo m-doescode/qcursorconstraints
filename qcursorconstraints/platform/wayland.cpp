@@ -107,8 +107,8 @@ static bool confineCursor_wayland(QWindow* window, QRect rect) {
 }
 
 QCursorConstraintsImpl QCursorConstraints::waylandImpl {
-    .init = &init_wayland,
-    .lockCursor = &lockCursor_wayland,
-    .confineCursor = &confineCursor_wayland,
-    .unlockCursor = &unlockCursor_wayland,
+    /* .init = */ &init_wayland,
+    /* .lockCursor = */ &lockCursor_wayland,
+    /* .confineCursor = */ &confineCursor_wayland,
+    /* .unlockCursor = */ &unlockCursor_wayland,
 };
