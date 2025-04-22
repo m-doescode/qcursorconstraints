@@ -68,5 +68,9 @@ Currently, also, the library is unable to handle cases in which the window may u
 
 ## Add to CMake
 
-    find_package(my_sample_lib CONFIG REQUIRED)
-    target_link_libraries(main PRIVATE my_sample_lib::my_sample_lib)
+    find_package(QCursorConstraints CONFIG REQUIRED)
+    target_link_libraries(main PRIVATE QCursorConstraints::QCursorConstraints)
+
+## Add via VCPKG
+
+TODO
