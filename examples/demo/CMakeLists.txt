@@ -8,16 +8,24 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+# https://stackoverflow.com/a/77892508/16255372
+if (NOT QT_VERSION_MAJOR)
+    find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+    message("   >>> Found Qt version: ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
+endif()
+
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 include(CPM)
 
 # If you're using this yourself, you'll want something similar to this instead
-CPMAddPackage("gh:m-doescode/qcursorconstraints@1.0.0")
+# CPMAddPackage("gh:m-doescode/qcursorconstraints#1.0.0")
+CPMAddPackage(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." NAME QCursorConstraints)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -26,7 +34,11 @@ set(PROJECT_SOURCES
         mainwindow.ui
 )
 
-qt_add_executable(demo ${PROJECT_SOURCES})
+if (Qt6_FOUND)
+    qt_add_executable(demo ${PROJECT_SOURCES})
+else()
+    add_executable(demo ${PROJECT_SOURCES})
+endif()
 target_include_directories(demo PRIVATE "../core")
 target_link_libraries(demo PRIVATE Qt${QT_VERSION_MAJOR}::Widgets QCursorConstraints)
 

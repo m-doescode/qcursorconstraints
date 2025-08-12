@@ -10,7 +10,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Gui Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Widgets)
 
 add_library(QCursorConstraints STATIC
@@ -31,7 +30,7 @@ else()
   )
 endif()
 
-target_link_libraries(QCursorConstraints PRIVATE Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::GuiPrivate Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(QCursorConstraints PUBLIC Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::GuiPrivate Qt${QT_VERSION_MAJOR}::Widgets)
 
 if (NOT WIN32)
   find_package(PkgConfig)
@@ -42,21 +41,4 @@ if (NOT WIN32)
 endif()
 
 target_compile_definitions(QCursorConstraints PRIVATE QCURSORCONSTRAINTS_LIBRARY)
-target_include_directories(QCursorConstraints PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-
-# https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html
-install(TARGETS QCursorConstraints
-        EXPORT QCursorConstraintsTargets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-install(FILES qcursorconstraints.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-install(EXPORT QCursorConstraintsTargets
-        FILE QCursorConstraintsTargets.cmake
-        NAMESPACE QCursorConstraints::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/QCursorConstraints
-)
+target_include_directories(QCursorConstraints PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
