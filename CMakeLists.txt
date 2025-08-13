@@ -27,6 +27,8 @@ else()
     platform/wayland.cpp
     platform/wayland-pointer-constraints-unstable-v1-client-protocol.h
     platform/wayland-pointer-constraints-unstable-v1-client-protocol.c
+    platform/wayland-relative-pointer-unstable-v1-client-protocol.h
+    platform/wayland-relative-pointer-unstable-v1-client-protocol.c
   )
 endif()
 

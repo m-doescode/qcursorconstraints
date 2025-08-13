@@ -15,8 +15,8 @@ public:
     {
         if (e->type() == QEvent::MouseMove) {
             if (lockedPoint.has_value()) {
-                QCursor::setPos(lockedPoint.value());
-                return true;
+                QCursor::setPos(targetWindow.value()->mapToGlobal(lockedPoint.value()));
+                return false;
             }
 
             if (confinedRect.has_value()) {

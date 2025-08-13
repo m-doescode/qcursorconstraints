@@ -1,8 +1,13 @@
 #include <qpa/qplatformnativeinterface.h>
 #include <QGuiApplication>
-#include <cstring>
+#include <QApplication>
+#include <QMouseEvent>
+#include <QEvent>
+#include <QWidget>
+#include <wayland-client-protocol.h>
 #include <wayland-client.h>
 #include "wayland-pointer-constraints-unstable-v1-client-protocol.h"
+#include "wayland-relative-pointer-unstable-v1-client-protocol.h"
 
 #include "../qcursorconstraints.h"
 
@@ -14,24 +19,47 @@
 static wl_display *display = NULL;
 static wl_seat* seat = NULL;
 static wl_pointer* pointer = NULL;
+static zwp_relative_pointer_v1* relative_pointer = NULL;
 static wl_compositor* compositor = NULL;
 static zwp_pointer_constraints_v1* pointer_constraints = NULL;
+static zwp_relative_pointer_manager_v1* relative_pointer_manager = NULL;
 
 static bool cursorLocked = false;
 static zwp_locked_pointer_v1* lockedPointer;
 static zwp_confined_pointer_v1* confinedPointer;
+static QPoint lockedPoint;
+
+static void relative_pointer_relative_motion(void *, struct zwp_relative_pointer_v1 *zwp_relative_pointer_v1, uint32_t utime_hi, uint32_t utime_lo,
+				wl_fixed_t dx, wl_fixed_t dy, wl_fixed_t dx_unaccel, wl_fixed_t dy_unaccel) {
+
+    if (!cursorLocked || lockedPointer == nullptr) return;
+
+    QWidget* widget = QApplication::focusWidget();
+    if (widget == nullptr) return;
+    
+    QPoint globalPos = lockedPoint + QPoint(dx_unaccel / 256, dy_unaccel / 256);
+    QPointF pos = widget->mapFromGlobal(globalPos);
+    QMouseEvent* evt = new QMouseEvent(QEvent::MouseMove, pos, Qt::NoButton, QApplication::mouseButtons(), QApplication::keyboardModifiers());
+    QApplication::postEvent(widget, evt);
+}
+
+const static struct zwp_relative_pointer_v1_listener relative_pointer_listener = {
+    .relative_motion = relative_pointer_relative_motion,
+};
 
 static void seat_handle_capabilities(void *, struct wl_seat *seat,
                                      uint32_t capabilities) {
     if (capabilities & WL_SEAT_CAPABILITY_POINTER) {
         // Grab pointer
         pointer = wl_seat_get_pointer(seat);
+        relative_pointer = zwp_relative_pointer_manager_v1_get_relative_pointer(relative_pointer_manager, pointer);
+        zwp_relative_pointer_v1_add_listener(relative_pointer, &relative_pointer_listener, NULL);
     }
 }
 
 static void seat_handle_name(void *, struct wl_seat*, const char*) { }
 
-const struct wl_seat_listener seat_listener = {
+const static struct wl_seat_listener seat_listener = {
     .capabilities = seat_handle_capabilities,
     .name = seat_handle_name,
 };
@@ -41,6 +69,8 @@ void handle_global(void *, wl_registry *registry,
 {
     if (strcmp(interface, zwp_pointer_constraints_v1_interface.name) == 0) {
         pointer_constraints = (zwp_pointer_constraints_v1*) wl_registry_bind(registry, name, &zwp_pointer_constraints_v1_interface, version);
+    } else if (strcmp(interface, zwp_relative_pointer_manager_v1_interface.name) == 0) {
+        relative_pointer_manager = (zwp_relative_pointer_manager_v1*) wl_registry_bind(registry, name, &zwp_relative_pointer_manager_v1_interface, version);
     } else if (strcmp(interface, wl_seat_interface.name) == 0) {
         seat = (wl_seat*) wl_registry_bind(registry, name, &wl_seat_interface, version);
         wl_seat_add_listener(seat, &seat_listener, NULL);
@@ -49,7 +79,7 @@ void handle_global(void *, wl_registry *registry,
     }
 }
 
-const struct wl_registry_listener registry_listener = {
+const static struct wl_registry_listener registry_listener = {
     .global = handle_global,
     .global_remove = NULL,
 };
@@ -89,6 +119,7 @@ static bool lockCursor_wayland(QWindow* window, QPoint pos) {
     wl_surface* surface = (wl_surface*) native->nativeResourceForWindow("surface", window);
     lockedPointer = zwp_pointer_constraints_v1_lock_pointer(pointer_constraints, surface, pointer, NULL, ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
     cursorLocked = true;
+    lockedPoint = QCursor::pos();
     return true;
 }
 
