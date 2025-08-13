@@ -26,7 +26,7 @@ else()
   target_sources(QCursorConstraints PRIVATE
     platform/wayland.cpp
     platform/wayland-pointer-constraints-unstable-v1-client-protocol.h
-    platform/wayland-pointer-constraints-unstable-v1-client-protocol.cpp
+    platform/wayland-pointer-constraints-unstable-v1-client-protocol.c
   )
 endif()
 
