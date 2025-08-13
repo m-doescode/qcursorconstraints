@@ -11,9 +11,10 @@ bool QCursorConstraints::init() {
 
     QString platformName = QGuiApplication::platformName();
 #ifdef _WIN32
-    if (platformName == "windows") {
-        activeImpl = &win32Impl;
-    } else
+    // Currently broken
+    // if (platformName == "windows") {
+        // activeImpl = &win32Impl;
+    // } else
 #else
     if (platformName == "wayland") {
         activeImpl = &waylandImpl;
